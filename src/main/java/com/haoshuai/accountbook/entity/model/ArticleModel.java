@@ -1,0 +1,38 @@
+package com.haoshuai.accountbook.entity.model;
+
+import com.haoshuai.accountbook.entity.ImgList;
+import com.haoshuai.accountbook.entity.User;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+public class ArticleModel {
+    private String uuid;
+
+    private String userid;
+
+    private String date;
+
+    private String content;
+
+    private String imgid;
+
+    private User user;
+
+    private List<ImgList> imgLists; //图片集合
+
+    private List<PraiseModel> praiseList; //点赞集合
+
+    private List<CommentModel> commentList;//评论集合
+
+    private int praiseCount;  //点赞计数
+
+    private int readCount;  //阅读计数
+
+    private int commentCount; //评论计数
+}

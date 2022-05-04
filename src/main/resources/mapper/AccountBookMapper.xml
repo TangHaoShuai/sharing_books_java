@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoshuai.accountbook.mapper.AccountBookMapper">
+
+    <select id="getUserAccountBooks" resultType="com.haoshuai.accountbook.entity.AccountBook"
+            parameterType="com.haoshuai.accountbook.entity.User">
+        SELECT *
+        FROM `account_book`
+        WHERE uuid IN
+              (SELECT account_book_id FROM `account_book_user` WHERE user_id = #{uuid})
+           or account_book_admin = #{uuid}
+    </select>
+
+    <select id="getUserNoAccountBooks" resultType="com.haoshuai.accountbook.entity.AccountBook"
+            parameterType="com.haoshuai.accountbook.entity.User">
+        SELECT *
+        FROM `account_book`
+        WHERE uuid not in
+              (SELECT account_book_id FROM `account_book_user` WHERE user_id = #{uuid})
+           and account_book_admin != #{uuid}
+    </select>
+</mapper>
