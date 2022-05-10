@@ -61,7 +61,7 @@ public class CodeGenerator {
         PackageConfig pc = new PackageConfig();
         //这里有个模块名的配置，可以注释掉不用。
 //        pc.setModuleName(scanner("模块名"));
-        pc.setParent("com.haoshuai.intelligentcommunity");
+        pc.setParent("com.haoshuai.accountbook");
         mpg.setPackageInfo(pc);
 
         // 自定义配置

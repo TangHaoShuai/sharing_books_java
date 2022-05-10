@@ -1,10 +1,10 @@
-package com.haoshuai.accountbook.entity;
-
-import java.io.Serializable;
+package com.haoshuai.accountbook.entity.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class User implements Serializable {
+public class UserVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,6 +34,11 @@ public class User implements Serializable {
     private String sex;
 
     private String url;
+
+    /**
+     * 是否已经存在
+     */
+    private boolean isExist;
 
     public String getUuid() {
         return uuid;
@@ -89,5 +94,13 @@ public class User implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public boolean isExist() {
+        return isExist;
+    }
+
+    public void setExist(boolean exist) {
+        isExist = exist;
     }
 }

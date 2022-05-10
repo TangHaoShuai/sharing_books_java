@@ -12,29 +12,23 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author TangHaoShuai
- * @since 2022-04-19
+ * @since 2022-05-10
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class AccountBookUser implements Serializable {
+public class AccountBookLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private String uuid;
 
+    private String message;
+
+    private String date;
+
     /**
      * 账本ID
      */
     private String accountBookId;
-
-    /**
-     * 用户ID
-     */
-    private String userId;
-
-    /**
-     * 管理员标识符
-     */
-    private int administrator;
 }

@@ -297,10 +297,10 @@ public class BillController {
     @PostMapping("getBills")
     public List<BillModel> getBills(@RequestBody Map<String, String> map) {
         String name = map.get("keyword");
-        String accoutBookId = map.get("accoutBookId");
+        String accountBookId = map.get("accountBookId");
         List<BillModel> billModels = new ArrayList<>();
         QueryWrapper<Bill> billQueryWrapper = new QueryWrapper<>();
-        billQueryWrapper.eq("account_book_id", accoutBookId);
+        billQueryWrapper.eq("account_book_id", accountBookId);
         billQueryWrapper.like(StringUtils.isNotEmpty(name), "message", name);
         List<Bill> billList = iBillService.list(billQueryWrapper);
         for (Bill b : billList) {

@@ -59,7 +59,6 @@ public class InformController {
                 Bill bill = new Bill();
                 BeanUtils.copyProperties(billTemp, bill); //拷贝字段相同
                 iBillService.save(bill);
-                iBillTempService.remove(billTempQueryWrapper);
                 QueryWrapper<Inform> informQueryWrapper = new QueryWrapper<>();
                 informQueryWrapper.eq("uuid", informModel.getUuid());
                 return iInformService.remove(informQueryWrapper);
@@ -91,7 +90,7 @@ public class InformController {
                 inform.setDate(df.format(new Date()));
                 return iInformService.save(inform);
             } else if (inform.getType().equals(Inform.INVITE)) {
-                //申请加入账本
+                //邀请加入账本
                 inform.setUuid(Util.getUUID());
                 QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
                 userQueryWrapper.eq("uuid", inform.getUserA());
@@ -116,6 +115,101 @@ public class InformController {
                 AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
                 //拼接消息
                 String message = "用户[" + user.getUsername() + "-" + user.getPhone() + "]申请加入您的账本[" + accountBook.getName() + "]一起编辑账本。";
+                inform.setMessage(message);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
+                inform.setDate(df.format(new Date()));
+                return iInformService.save(inform);
+            } else if (inform.getType().equals(Inform.BE_APPROVED)) {
+                //审核通过
+                inform.setUuid(Util.getUUID());
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("uuid", inform.getUserA());
+                User user = iUserService.getOne(userQueryWrapper);//获取发送者信息
+                QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+                accountBookQueryWrapper.eq("uuid", inform.getAccountBookId());
+                AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
+                //拼接消息
+                String message = "您对账本:[" + accountBook.getName() + "]发起的一条账目审核已经通过！";
+                inform.setMessage(message);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
+                inform.setDate(df.format(new Date()));
+                return iInformService.save(inform);
+            } else if (inform.getType().equals(Inform.AUDIT_FAILED)) {
+//                审核不通过
+
+                inform.setUuid(Util.getUUID());
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("uuid", inform.getUserA());
+                User user = iUserService.getOne(userQueryWrapper);//获取发送者信息
+                QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+                accountBookQueryWrapper.eq("uuid", inform.getAccountBookId());
+                AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
+                //拼接消息
+                String message = "您对账本:[" + accountBook.getName() + "]发起的一条账目审核不通过！";
+                inform.setMessage(message);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
+                inform.setDate(df.format(new Date()));
+                return iInformService.save(inform);
+            } else if (inform.getType().equals(Inform.APPLY_FOR_YES)) {
+//                申请加入账本_通过
+
+                inform.setUuid(Util.getUUID());
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("uuid", inform.getUserA());
+                User user = iUserService.getOne(userQueryWrapper);//获取发送者信息
+                QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+                accountBookQueryWrapper.eq("uuid", inform.getAccountBookId());
+                AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
+                //拼接消息
+                String message = "您申请加入的账本:[" + accountBook.getName() + "]审核通过";
+                inform.setMessage(message);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
+                inform.setDate(df.format(new Date()));
+                return iInformService.save(inform);
+            } else if (inform.getType().equals(Inform.APPLY_FOR_NO)) {
+//          申请加入账本_不通过
+
+                inform.setUuid(Util.getUUID());
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("uuid", inform.getUserA());
+                User user = iUserService.getOne(userQueryWrapper);//获取发送者信息
+                QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+                accountBookQueryWrapper.eq("uuid", inform.getAccountBookId());
+                AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
+                //拼接消息
+                String message = "您申请加入的账本:[" + accountBook.getName() + "]审核不通过";
+                inform.setMessage(message);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
+                inform.setDate(df.format(new Date()));
+                return iInformService.save(inform);
+            } else if (inform.getType().equals(Inform.INVITE_YES)) {
+//                邀请加入账本_通过
+
+                inform.setUuid(Util.getUUID());
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("uuid", inform.getUserA());
+                User user = iUserService.getOne(userQueryWrapper);//获取发送者信息
+                QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+                accountBookQueryWrapper.eq("uuid", inform.getAccountBookId());
+                AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
+                //拼接消息
+                String message = "您邀请[" + user.getUsername() + "加入的账本:[" + accountBook.getName() + "]对方已经同意";
+                inform.setMessage(message);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
+                inform.setDate(df.format(new Date()));
+                return iInformService.save(inform);
+            } else if (inform.getType().equals(Inform.INVITE_NO)) {
+//                邀请加入账本_拒绝
+
+                inform.setUuid(Util.getUUID());
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("uuid", inform.getUserA());
+                User user = iUserService.getOne(userQueryWrapper);//获取发送者信息
+                QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+                accountBookQueryWrapper.eq("uuid", inform.getAccountBookId());
+                AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
+                //拼接消息
+                String message = "您邀请[" + user.getUsername() + "加入的账本:[" + accountBook.getName() + "]对方拒绝加入";
                 inform.setMessage(message);
                 SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
                 inform.setDate(df.format(new Date()));
@@ -204,7 +298,7 @@ public class InformController {
     public boolean deleteInform(@RequestBody InformModel informModel) {
         QueryWrapper<Inform> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uuid", informModel.getUuid());
-        if (informModel.getType().equals(Inform.AUDIT)) {
+        if (informModel.getType().equals(Inform.AUDIT_FAILED) || informModel.getType().equals(Inform.BE_APPROVED)) {
             String path = Util.BILL_PATH + informModel.getBillTemp().getImg();
             File file = new File(path);
             if (file.exists()) {

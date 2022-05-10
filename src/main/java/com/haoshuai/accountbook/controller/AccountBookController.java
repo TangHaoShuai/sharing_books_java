@@ -3,15 +3,10 @@ package com.haoshuai.accountbook.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.haoshuai.accountbook.entity.AccountBook;
-import com.haoshuai.accountbook.entity.AccountBookUser;
-import com.haoshuai.accountbook.entity.Bill;
-import com.haoshuai.accountbook.entity.User;
+import com.haoshuai.accountbook.entity.*;
 import com.haoshuai.accountbook.entity.model.AccountBookModel;
-import com.haoshuai.accountbook.service.IAccountBookService;
-import com.haoshuai.accountbook.service.IAccountBookUserService;
-import com.haoshuai.accountbook.service.IBillService;
-import com.haoshuai.accountbook.service.IUserService;
+import com.haoshuai.accountbook.entity.model.AccountBookVo;
+import com.haoshuai.accountbook.service.*;
 import com.haoshuai.accountbook.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,9 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -50,26 +43,59 @@ public class AccountBookController {
     @Autowired
     private IBillService iBillService;
 
+    @Autowired
+    private IAccountBookLogService iAccountBookLogService;
+
+    @PostMapping("getAccountBookByUserID")
+    public List<AccountBookVo> getAccountBookByUserID(@RequestBody User user) {
+        if (Util.isStringNull(user.getPhone())) {
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.eq("phone", user.getPhone());
+            User temUser = iUserService.getOne(userQueryWrapper);
+            QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+            accountBookQueryWrapper.eq("account_book_admin", temUser.getUuid());
+            List<AccountBook> accountBooks = iAccountBookService.list(accountBookQueryWrapper);
+            if (accountBooks.size() == 0) return null;
+            List<AccountBookVo> accountBookVos = new ArrayList<>();
+            for (AccountBook a : accountBooks) {
+                QueryWrapper<AccountBookUser> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("account_book_id", a.getUuid());
+                queryWrapper.eq("user_id", user.getUuid());
+                AccountBookUser accountBookUser = iAccountBookUserService.getOne(queryWrapper);
+                AccountBookVo accountBookVo = new AccountBookVo();
+                BeanUtils.copyProperties(a, accountBookVo); //拷贝字段相同
+                if (accountBookUser != null) {
+                    accountBookVo.setExist(true);
+                } else {
+                    accountBookVo.setExist(false);
+                }
+                accountBookVos.add(accountBookVo);
+            }
+            return accountBookVos;
+        } else {
+            return null;
+        }
+    }
 
     @PostMapping("deleteAccountBook")
-    public boolean deleteAccountBook (@RequestBody AccountBook accountBook) {
-        if (Util.isStringNull(accountBook.getUuid())){
+    public boolean deleteAccountBook(@RequestBody AccountBook accountBook) {
+        if (Util.isStringNull(accountBook.getUuid())) {
             QueryWrapper<Bill> billQueryWrapper = new QueryWrapper<>();
-            billQueryWrapper.eq("account_book_id",accountBook.getUuid());
-            List<Bill>billList =iBillService.list(billQueryWrapper);
-            for (Bill b :billList){
-                if (Util.isStringNull(b.getImg())){
-                    String path = Util.BILL_PATH+b.getImg();
+            billQueryWrapper.eq("account_book_id", accountBook.getUuid());
+            List<Bill> billList = iBillService.list(billQueryWrapper);
+            for (Bill b : billList) {
+                if (Util.isStringNull(b.getImg())) {
+                    String path = Util.BILL_PATH + b.getImg();
                     File file = new File(path);
-                    if (file.exists()){
+                    if (file.exists()) {
                         file.delete();
                     }
                 }
             }
-            QueryWrapper<AccountBook>accountBookQueryWrapper = new QueryWrapper<>();
-            accountBookQueryWrapper.eq("uuid",accountBook.getUuid());
+            QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+            accountBookQueryWrapper.eq("uuid", accountBook.getUuid());
             return iAccountBookService.remove(accountBookQueryWrapper);
-        }else {
+        } else {
             return false;
         }
     }
@@ -77,23 +103,37 @@ public class AccountBookController {
 
     /**
      * 更新账本名字
+     *
      * @param accountBook
      * @return
      */
     @PostMapping("updateAccountBookName")
-    public boolean updateAccountBookName(@RequestBody AccountBook accountBook) {
+    public Map<String, String> updateAccountBookName(@RequestBody AccountBook accountBook) {
         if (Util.isStringNull(accountBook.getUuid()) && Util.isStringNull(accountBook.getName())) {
-            UpdateWrapper<AccountBook> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("uuid", accountBook.getUuid());
-            updateWrapper.set("name", accountBook.getName());
-            return iAccountBookService.update(null, updateWrapper);
+            Map<String, String> map = new HashMap<>();
+            QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+            accountBookQueryWrapper.eq("name", accountBook.getName());
+            List<AccountBook> accountBooks = iAccountBookService.list(accountBookQueryWrapper);
+            if (accountBooks.size() < 1) {
+                UpdateWrapper<AccountBook> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.eq("uuid", accountBook.getUuid());
+                updateWrapper.set("name", accountBook.getName());
+                iAccountBookService.update(null, updateWrapper);
+                map.put("state", "200");
+                map.put("message", "更新成功");
+            } else {
+                map.put("state", "500");
+                map.put("message", "账本名字已经存在");
+            }
+            return map;
         } else {
-            return false;
+            return null;
         }
     }
 
     /**
      * 用户不在成员组的账本
+     *
      * @param user
      * @return
      */
@@ -124,6 +164,7 @@ public class AccountBookController {
 
     /**
      * 根据ID 查询账本
+     *
      * @param accountBook
      * @return
      */
@@ -201,14 +242,34 @@ public class AccountBookController {
      * @return
      */
     @PostMapping("addAccountBook")
-    public boolean addAccountBook(@RequestBody AccountBook accountBook) {
+    public Map<String, String> addAccountBook(@RequestBody AccountBook accountBook) {
         if (Util.isStringNull(accountBook.getName()) &&
                 Util.isStringNull(accountBook.getAccountBookType()) &&
                 Util.isStringNull(accountBook.getAccountBookAdmin())) {
+            Map<String, String> map = new HashMap<>();
             accountBook.setUuid(Util.getUUID());
-            return iAccountBookService.save(accountBook);
+            QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+            accountBookQueryWrapper.eq("name", accountBook.getName());
+            List<AccountBook> accountBooks = iAccountBookService.list(accountBookQueryWrapper);
+            if (accountBooks.size() < 1) {
+                iAccountBookService.save(accountBook);
+
+                AccountBookLog accountBookLog = new AccountBookLog();
+                accountBookLog.setUuid(Util.getUUID());
+                accountBookLog.setDate(Util.getDate());
+                accountBookLog.setAccountBookId(accountBook.getUuid());
+                accountBookLog.setMessage("[" + accountBook.getAccountBookAdmin() + "]创建了该账本");
+                iAccountBookLogService.save(accountBookLog);
+
+                map.put("state", "200");
+                map.put("message", "添加成功");
+            } else {
+                map.put("state", "500");
+                map.put("message", "账本名字已经存在");
+            }
+            return map;
         } else {
-            return false;
+            return null;
         }
     }
 }

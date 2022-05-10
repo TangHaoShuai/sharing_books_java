@@ -1,26 +1,13 @@
-package com.haoshuai.accountbook.entity;
-
-import java.io.Serializable;
+package com.haoshuai.accountbook.entity.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-/**
- * <p>
- *
- * </p>
- *
- * @author TangHaoShuai
- * @since 2022-04-19
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class AccountBookUser implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
+public class AccountBookUserModel {
     private String uuid;
 
     /**
@@ -37,4 +24,40 @@ public class AccountBookUser implements Serializable {
      * 管理员标识符
      */
     private int administrator;
+
+    /**
+     * 用户ID
+     */
+    private String userUuid;
+
+    /**
+     * 用户名字
+     */
+    private String userName;
+
+    /**
+     * 用户手机号
+     */
+    private String userPhone;
+
+    private String userUrl;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

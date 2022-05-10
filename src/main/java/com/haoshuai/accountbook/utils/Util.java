@@ -1,5 +1,7 @@
 package com.haoshuai.accountbook.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class Util {
@@ -17,5 +19,10 @@ public class Util {
         } else {
             return true;
         }
+    }
+
+    public static String getDate() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");//设置日期格式
+        return df.format(new Date());
     }
 }

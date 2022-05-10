@@ -3,6 +3,7 @@ package com.haoshuai.accountbook.service;
 import com.haoshuai.accountbook.entity.AccountBookUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haoshuai.accountbook.entity.User;
+import com.haoshuai.accountbook.entity.model.AccountBookUserModel;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,4 +18,6 @@ import java.util.List;
  */
 public interface IAccountBookUserService extends IService<AccountBookUser> {
     List<User> getNoAccountBookUser(@Param("userid") String userid, @Param("account_book_id") String account_book_id);
+
+    List<AccountBookUserModel> getAccountBookUserModel(@Param("account_book_id") String account_book_id);
 }

@@ -9,4 +9,13 @@
             SELECT user_id FROM `account_book_user` WHERE account_book_id = #{account_book_id})
           AND uuid != #{userid}
     </select>
+
+    <select id="getAccountBookUserModel" resultType="com.haoshuai.accountbook.entity.model.AccountBookUserModel"
+            parameterType="java.lang.String">
+        SELECT a.*, u.uuid as user_uuid, u.username as user_name, u.phone as user_phone ,u.url as user_url
+        FROM `account_book_user` as a
+                 JOIN `user` as u on a.user_id = u.uuid
+        WHERE account_book_id = #{account_book_id}
+    </select>
+
 </mapper>
