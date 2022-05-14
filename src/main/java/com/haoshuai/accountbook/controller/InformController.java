@@ -49,6 +49,20 @@ public class InformController {
     @Autowired
     private IBillService iBillService;
 
+    @Autowired
+    private IAccountBookUserService iAccountBookUserService;
+
+    @PostMapping("getInformByUuid")
+    public Inform getInformByUuid(@RequestBody Inform inform) {
+        if (Util.isStringNull(inform.getUuid())) {
+            QueryWrapper<Inform> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("uuid", inform.getUuid());
+            return iInformService.getOne(queryWrapper);
+        } else {
+            return null;
+        }
+    }
+
     @PostMapping("consent")
     public boolean consent(@RequestBody InformModel informModel) {
         if (informModel != null) {
@@ -251,6 +265,22 @@ public class InformController {
         QueryWrapper<Inform> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_b", inform.getUserB());
         List<Inform> informs = iInformService.list(queryWrapper);
+
+        QueryWrapper<AccountBookUser> accountBookUserQueryWrapper = new QueryWrapper<>();
+        accountBookUserQueryWrapper.eq("user_id", inform.getUserB());
+        accountBookUserQueryWrapper.eq("administrator", 1);
+        List<AccountBookUser> accountBookUsers = iAccountBookUserService.list(accountBookUserQueryWrapper);
+
+        for (AccountBookUser a : accountBookUsers) {
+            QueryWrapper<Inform> informQueryWrapper = new QueryWrapper<>();
+            informQueryWrapper.eq("account_book_id", a.getAccountBookId());
+            informQueryWrapper.and(wrapper -> wrapper.eq("type", Inform.AUDIT).or().eq("type", Inform.APPLY_FOR));
+            List<Inform> informList = iInformService.list(informQueryWrapper);
+            for (Inform i : informList) {
+                informs.add(i);
+            }
+        }
+
         for (Inform s : informs) {
             QueryWrapper<User> userQueryWrapperA = new QueryWrapper<>();
             userQueryWrapperA.eq("uuid", s.getUserA());

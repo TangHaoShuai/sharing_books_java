@@ -258,7 +258,11 @@ public class AccountBookController {
                 accountBookLog.setUuid(Util.getUUID());
                 accountBookLog.setDate(Util.getDate());
                 accountBookLog.setAccountBookId(accountBook.getUuid());
-                accountBookLog.setMessage("[" + accountBook.getAccountBookAdmin() + "]创建了该账本");
+                QueryWrapper<User>queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("uuid",accountBook.getAccountBookAdmin());
+                User user = iUserService.getOne(queryWrapper);
+
+                accountBookLog.setMessage("[" + user.getUsername()+":"+user.getPhone() + "]创建了该账本");
                 iAccountBookLogService.save(accountBookLog);
 
                 map.put("state", "200");

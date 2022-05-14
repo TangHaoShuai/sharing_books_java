@@ -3,10 +3,12 @@ package com.haoshuai.accountbook.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.haoshuai.accountbook.entity.AccountBook;
 import com.haoshuai.accountbook.entity.AccountBookUser;
 import com.haoshuai.accountbook.entity.User;
 import com.haoshuai.accountbook.entity.model.AccountBookUserModel;
 import com.haoshuai.accountbook.entity.model.UserVo;
+import com.haoshuai.accountbook.service.IAccountBookService;
 import com.haoshuai.accountbook.service.IAccountBookUserService;
 import com.haoshuai.accountbook.service.IUserService;
 import com.haoshuai.accountbook.utils.Util;
@@ -35,6 +37,8 @@ public class AccountBookUserController {
     private IAccountBookUserService iAccountBookUserService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private IAccountBookService iAccountBookService;
 
     @PostMapping("getJurisdiction")
     public boolean getJurisdiction(@RequestBody AccountBookUser accountBookUser) {
@@ -123,18 +127,22 @@ public class AccountBookUserController {
         String phone = map.get("phone");
         String account_book_id = map.get("account_book_id");
         List<UserVo> userVoList = new ArrayList<>();
+        QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+        accountBookQueryWrapper.eq("uuid", account_book_id);
+        AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);
         if (Util.isStringNull(phone) && Util.isStringNull(account_book_id)) {
             UserVo userVo = new UserVo();
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("phone", phone);
             User user = iUserService.getOne(queryWrapper);
             BeanUtils.copyProperties(user, userVo); //拷贝字段相同
-
             QueryWrapper<AccountBookUser> accountBookUserQueryWrapper = new QueryWrapper<>();
             accountBookUserQueryWrapper.eq("account_book_id", account_book_id);
             accountBookUserQueryWrapper.eq("user_id", user.getUuid());
             AccountBookUser accountBookUser = iAccountBookUserService.getOne(accountBookUserQueryWrapper);
             if (accountBookUser != null) {
+                userVo.setExist(true);
+            } else if (user.getUuid().equals(accountBook.getAccountBookAdmin())) {
                 userVo.setExist(true);
             } else {
                 userVo.setExist(false);
