@@ -24,12 +24,13 @@ public class Inform implements Serializable {
     public static final String AUDIT = "账本审核";
     public static final String INVITE = "邀请加入账本";
     public static final String APPLY_FOR = "申请加入账本";
-    public static final String AUDIT_FAILED="审核不通过";
-    public static final String BE_APPROVED ="审核通过";
+    public static final String AUDIT_FAILED = "审核不通过";
+    public static final String BE_APPROVED = "审核通过";
     public static final String INVITE_NO = "邀请加入账本_拒绝";
     public static final String INVITE_YES = "邀请加入账本_通过";
     public static final String APPLY_FOR_NO = "申请加入账本_不通过";
     public static final String APPLY_FOR_YES = "申请加入账本_通过";
+    public static final String DELETE_USER = "删除成员";
 
     private String uuid;
 

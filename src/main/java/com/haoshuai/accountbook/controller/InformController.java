@@ -228,6 +228,21 @@ public class InformController {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
                 inform.setDate(df.format(new Date()));
                 return iInformService.save(inform);
+            } else if (inform.getType().equals(Inform.DELETE_USER)) {
+                // 删除成员
+                inform.setUuid(Util.getUUID());
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("uuid", inform.getUserA());
+                User user = iUserService.getOne(userQueryWrapper);//获取发送者信息
+                QueryWrapper<AccountBook> accountBookQueryWrapper = new QueryWrapper<>();
+                accountBookQueryWrapper.eq("uuid", inform.getAccountBookId());
+                AccountBook accountBook = iAccountBookService.getOne(accountBookQueryWrapper);//获取账本信息
+                //拼接消息
+                String message = "管理员[" + user.getUsername() + "]把您移除出了[" + accountBook.getName() + "]账本";
+                inform.setMessage(message);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");//设置日期格式
+                inform.setDate(df.format(new Date()));
+                return iInformService.save(inform);
             }
             return false;
         } else {
